@@ -1,12 +1,13 @@
 import json
 from selenium import webdriver
 from time import sleep
-from tomorrow import threads
 import requests
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.webdriver.common.keys import Keys
 
 # TODO 能够实现跳转，但是现在没有选课页面，所以开始选课模块还没有完善
+# TODO 通过cookie跳过验证码，B站有视频
+# TODO 多线程，B站有视频
 file = 'cookies.json'
 
 
