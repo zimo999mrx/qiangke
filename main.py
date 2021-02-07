@@ -9,6 +9,8 @@ from threading import Thread
 # TODO 能够实现跳转，但是现在没有选课页面，所以开始选课模块还没有完善
 
 users = [['201906120122', 'asdasdasd123']]
+courses = []
+cookies = []
 
 
 class alert_is_present(object):
@@ -29,16 +31,12 @@ class alert_is_present(object):
 def first_login():
     """ 第一次登陆，手动登录获取cookie """
     while True:
-        # 弹窗的处理
-        alert_result = alert_is_present()(driver)
-        if alert_result:
-            print("系统弹窗了：", alert_result.text)
-            alert_result.accept()
-        # 获取当前页url
-        page_url = driver.current_url
-        #
         print("手动登陆中...")
         driver.get("http://jwxw.gzcc.cn/default2.aspx")
+        page_url = driver.current_url
+        if page_url != "http://jwxw.gzcc.cn/default2.aspx":
+            print("登录页面进不去!!!")
+            return
         driver.find_element_by_name('txtUserName').clear()
         driver.find_element_by_name('txtUserName').send_keys(users[0][0])
         driver.find_element_by_name('TextBox2').clear()
@@ -46,14 +44,22 @@ def first_login():
         checkcode = input("验证码：")
         driver.find_element_by_name("txtSecretCode").send_keys(checkcode)
         driver.find_element_by_id('Button1').click()
-        sleep(0.5)
+        # 弹窗的处理
+        alert_result = alert_is_present()(driver)
+        if alert_result:
+            print(alert_result.text)
+            alert_result.accept()
+        # 获取当前页url
         page_url = driver.current_url
         if page_url == "http://jwxw.gzcc.cn/xs_main.aspx?xh=" + f"{users[0][0]}":
             print("登录成功")
             cookies = driver.get_cookies()
             if cookies:
+                # save_cookies
+                with open("cookies.txt", "w") as fp:
+                    json.dump(cookies, fp)
                 print("cookie获取完毕:", cookies)
-                # 下一步
+                login()
                 break
             else:
                 print("cookie获取失败...重新开始流程...")
@@ -62,20 +68,49 @@ def first_login():
     pass
 
 
-def transition_login_to_course_selection():
-    """ 从登录页面过渡到选课页面 """
-    driver.refresh()
+def login():
+    print("进入登录页面...")
+    # 先进入用户页面的网址
+    driver.get("http://jwxw.gzcc.cn/xs_main.aspx?xh=" + f"{users[0][0]}")
+    driver.delete_all_cookies()
+    # take_cookies
+    with open("cookies.txt", "r") as fp:
+        cookies = json.load(fp)
+    for cookie in cookies:
+        driver.add_cookie(cookie)
+    driver.get("http://jwxw.gzcc.cn/xs_main.aspx?xh=" + f"{users[0][0]}")
+    # 弹窗的处理
+    alert_result = alert_is_present()(driver)
+    if alert_result:
+        print(alert_result.text)
+        alert_result.accept()
+    # 获取当前页url
+    page_url = driver.current_url
+    # 能不能直接进入页面
+    if page_url == "http://jwxw.gzcc.cn/xs_main.aspx?xh=" + f"{users[0][0]}":
+        transfer_station5()
+    elif page_url == "http://jwxw.gzcc.cn/default2.aspx":
+        first_login()
+
+
+def transfer_station5():
+    """ 中转站5 """
     print("进入选课页面...")
     driver.find_element_by_css_selector(".nav>ul>li:nth-of-type(4)").click()
     driver.find_element_by_css_selector(".nav>ul>li:nth-of-type(4) ul.sub>li:nth-of-type(1)>a").send_keys(Keys.ENTER)
-    course_selection()
+    # 自己抢 还是 电脑抢
+    qiangke(1)
 
 
-def course_selection():
-    """ 具体的选课业务 """
-    print("开始选课...")
+def qiangke(num, ):
+    """ 开始抢课 """
+    print(f"开始抢课({num})...")
 
 
 if __name__ == '__main__':
     driver = webdriver.Chrome(r'C:\Program Files (x86)\Google\Chrome\Application\chromedriver.exe')
-    first_login()
+    # 如果是第一次登陆，先运行一遍 first_login()，再去运行 login()
+    # first_login()
+    login()
+    sleep(5)
+    driver.quit()
