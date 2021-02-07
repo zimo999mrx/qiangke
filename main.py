@@ -112,5 +112,6 @@ if __name__ == '__main__':
     # 如果是第一次登陆，先运行一遍 first_login()，再去运行 login()
     # first_login()
     login()
+    # 非测试无需关闭
     sleep(5)
     driver.quit()
