@@ -5,15 +5,14 @@ import requests
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.webdriver.common.keys import Keys
 
+
 # TODO 能够实现跳转，但是现在没有选课页面，所以开始选课模块还没有完善
-# TODO 通过cookie跳过验证码，B站有视频
-# TODO 多线程，B站有视频
-file = 'cookies.json'
+# TODO 通过cookie跳过验证码，
+# TODO 多线程，
 
 
 class alert_is_present(object):
-    """ Expect an alert to be present."""
-    """判断当前页面的alert弹窗"""
+    """ 判断当前页面的alert弹窗 """
 
     def __init__(self):
         pass
@@ -28,20 +27,21 @@ class alert_is_present(object):
 
 
 def login():
+    """ 登录操作 """
     print("开始登陆...")
     # 先进入用户页面的网址
     driver.get("http://jwxw.gzcc.cn/xs_main.aspx?xh=201906120122")
     while True:
         # 弹窗的处理
-        alert_reusult = alert_is_present()(driver)
-        if alert_reusult:
-            print(alert_reusult.text)
-            alert_reusult.accept()
+        alert_result = alert_is_present()(driver)
+        if alert_result:
+            print(alert_result.text)
+            alert_result.accept()
         # 获取当前页url
         page_url = driver.current_url
         # 能不能直接进入页面
         if page_url == "http://jwxw.gzcc.cn/xs_main.aspx?xh=201906120122":
-            phase1()
+            transition_login_to_course_selection()
             break
         elif page_url == "http://jwxw.gzcc.cn/default2.aspx":
             print("需要手动登录...")
@@ -52,18 +52,21 @@ def login():
             checkcode = input("验证码：")
             driver.find_element_by_name("txtSecretCode").send_keys(checkcode)
             driver.find_element_by_id('Button1').click()
+            print("获取cookie...")
 
 
-def phase1():
+def transition_login_to_course_selection():
+    """ 从登录页面过渡到选课页面 """
     driver.refresh()
     print("进入选课页面...")
     driver.find_element_by_css_selector(".nav>ul>li:nth-of-type(4)").click()
     driver.find_element_by_css_selector(".nav>ul>li:nth-of-type(4) ul.sub>li:nth-of-type(1)>a").send_keys(Keys.ENTER)
     print("成功进入选课页面")
-    phase2()
+    course_selection()
 
 
-def phase2():
+def course_selection():
+    """ 具体的选课业务 """
     print("开始选课...")
     print("成功选课")
 
