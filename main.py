@@ -6,8 +6,6 @@ from selenium.common.exceptions import NoAlertPresentException
 from selenium.webdriver.common.keys import Keys
 from threading import Thread
 
-# TODO 能够实现跳转，但是现在没有选课页面，所以开始选课模块还没有完善
-
 users = [['201906120122', 'asdasdasd123']]
 courses = []
 cookies = []
@@ -100,11 +98,13 @@ def transfer_station5():
     driver.find_element_by_css_selector(".nav>ul>li:nth-of-type(4) ul.sub>li:nth-of-type(1)>a").send_keys(Keys.ENTER)
     # 自己抢 还是 电脑抢
     qiangke(1)
+    # TODO 这里加个多线程(不一定有时间写，写完还不一定成功，就这样先，目前能够进入页面然后手动选课已经很好了)
 
 
 def qiangke(num, ):
     """ 开始抢课 """
     print(f"开始抢课({num})...")
+    # TODO 可以进去选课页面这里也可以完善一下
 
 
 if __name__ == '__main__':
